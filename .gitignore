@@ -8,6 +8,8 @@
 bin/
 target/
 tmp/
+.idea/
+radial-conflict.iml
 *.tmp
 *.bak
 *.swp

@@ -1,18 +1,74 @@
 <!doctype html>
 <html>
-  <head>
-    <title>App Engine Demo</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  </head>
-  <body>
-    <div id="result">Loading...</div>
+	<head>
+		<title>Radial Conflict</title>
+		<style>canvas { width: 100%; height: 100% }</style>
+		<script src="js/three.min.js"></script>
+		<script src="js/jquery.min.js"></script>
+	</head>
+	<body>
+		<script>
+			
+		
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 0.1, 1000);
 
-    <script>
-$(document).ready(function() {
-  $.getJSON('/demo', function(data) {
-    $('#result').html("Hello, " + data.name);
-  });
-});
-    </script>
-  </body>
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+
+			var sun = new THREE.Mesh(
+				new THREE.SphereGeometry(10), 
+				new THREE.MeshBasicMaterial({color: 0xffff00}));
+			sun.position.x = 0;
+			sun.position.y = 0;
+			sun.position.z = 0;
+			scene.add(sun);
+			
+			var geometry = new THREE.BoxGeometry(5,5,5);
+			var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+			var planet = new THREE.Mesh(geometry, material);
+			scene.add(planet);
+
+			camera.position.z = 150;
+
+			var x = 0;
+			var y = 0;
+			
+			var update = function () {
+				$.getJSON('/frame', function(data) {
+					x = data.x;
+					y = data.y;
+				});
+			};
+			
+			update();
+			
+			var lastUpdate = 0;
+			
+			var render = function () {
+				var tick = 1000;
+				var now = new Date().getTime();
+				
+				if (lastUpdate + tick < now){
+					update();
+					lastUpdate = now;
+				}				
+			
+				requestAnimationFrame(render);
+
+				planet.rotation.x += 0.1;
+				planet.rotation.y += 0.1;
+				
+				planet.position.x = x;
+				planet.position.y = y;
+
+				renderer.render(scene, camera);
+			};
+			
+			
+
+			render();
+		</script>
+	</body>
 </html>

@@ -2,20 +2,24 @@ package radial.conflict;
 
 import java.io.IOException;
 import javax.servlet.http.*;
+import com.google.inject.*;
 
 public class GetFrameServlet extends HttpServlet {
+
+    private final IFrameFactory frameFactory;
+
+    @Inject
+    public GetFrameServlet(IFrameFactory frameFactory) {
+        this.frameFactory = frameFactory;
+    }
+
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
+        Frame frame = frameFactory.Create();
+
         resp.setContentType("text/plain");
-		
-		long seconds = System.currentTimeMillis() / 1000;
-		double radians = seconds / 30.0;
-		double radius = 100;
-		double x = radius * Math.sin(radians);
-		double y = radius * Math.cos(radians);
-		
 		String template = "{ \"x\": %f, \"y\": %f }";
-        resp.getWriter().println(String.format(template, x, y));
+        resp.getWriter().println(String.format(template, frame.getX(), frame.getY()));
     }
 }
